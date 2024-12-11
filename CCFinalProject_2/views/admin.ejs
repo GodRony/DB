@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>블로그 관리자 패널</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- 사이드바 -->
+        <div class="w-64 bg-blue-900 text-white">
+            <div class="p-6 border-b border-blue-700">
+                <h2 class="text-xl font-bold text-blue-100">Admin Dashboard</h2>
+            </div>
+            <nav class="py-4">
+                <a href="#posts" class="block px-6 py-3 hover:bg-blue-800 transition-colors">
+                    📝 포스트 관리
+                </a>
+                <a href="#comments" class="block px-6 py-3 hover:bg-blue-800 transition-colors">
+                    💬 댓글 관리
+                </a>
+                <a href="#settings" class="block px-6 py-3 hover:bg-blue-800 transition-colors">
+                    ⚙️ 시스템 설정
+                </a>
+            </nav>
+        </div>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="flex-1 p-10">
+            <!-- 포스트 관리 섹션 -->
+            <div id="postsSection" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-blue-900">포스트 목록</h1>
+                    <button id="newPostBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        새 포스트 작성
+                    </button>
+                    
+                    <script>
+                        document.getElementById('newPostBtn').addEventListener('click', () => {
+                            // 버튼 클릭 시 /post로 이동
+                            window.location.href = '/post';
+                        });
+                    </script>
+                    
+                </div>
+                
+                <div class="bg-white shadow rounded-lg">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="p-3 text-left">제목</th>
+                                <th class="p-3 text-left">작성일</th>
+                                <th class="p-3 text-left">상태</th>
+                                <th class="p-3 text-right">액션</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- EJS에서 동적으로 포스트 데이터 출력 -->
+                            <% if (diaries.length > 0) { %> <!-- diaries 배열에 데이터가 있는 경우 -->
+                                <% diaries.forEach(diary => { %>
+                                    <tr class="border-b">
+                                        <td class="p-3"><%= diary.title %></td> <!-- 포스트 제목 -->
+                                        <td class="p-3"><%= new Date(diary.created_at).toLocaleDateString() %></td> <!-- 작성일 -->
+                                        <td class="p-3">
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                                                게시됨
+                                            </span>
+                                        </td>
+                                        <td class="p-3 text-right">
+                                            <button class="text-blue-600 mr-2">수정</button>
+                                            <!-- 삭제 버튼을 form으로 감싸서 POST 요청을 보냄 -->
+                                            <form action="/delete" method="POST" style="display:inline;">
+                                                <input type="hidden" name="deleteItemId" value="<%= diary.id %>"> <!-- 삭제할 포스트의 ID를 hidden으로 전달 -->
+                                                <button type="submit" class="text-red-600">삭제</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %> <!-- diaries 배열이 비어 있을 경우 -->
+                                <tr>
+                                    <td colspan="4" class="p-3 text-center">포스트가 없습니다.</td>
+                                </tr>
+                            <% } %>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            
+            </div>
+       
+        </div>
+        
+    </div>
+    
+    <footer class="bg-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-600">
+            <p>© 2024 Hallym University Blog. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:text-blue-600">개인정보 처리방침</a>
+                <a href="#" class="hover:text-blue-600">이용약관</a>
+                <a href="#" class="hover:text-blue-600">문의하기</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
