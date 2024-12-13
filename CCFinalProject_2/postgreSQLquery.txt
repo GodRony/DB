@@ -1,0 +1,54 @@
+//그대로 복붙하세용.
+
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'diaries';
+
+select * from diaries;
+
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,              -- 댓글 ID (자동 증가)
+    diary_id INTEGER NOT NULL,          -- 댓글이 달린 블로그 포스트 ID
+    content TEXT NOT NULL,              -- 댓글 내용
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- 작성 시간
+    author VARCHAR(255) DEFAULT '익명', -- 댓글 작성자 (기본값 '익명')
+    CONSTRAINT fk_diary
+        FOREIGN KEY (diary_id) REFERENCES diaries(id) ON DELETE CASCADE -- 외래 키
+);
+
+-- INSERT INTO comments (diary_id, content, author) 
+-- VALUES 
+-- (1, '첫 번째 포스트댓글 와 반가워.', '유희영');
+
+-- INSERT INTO comments (diary_id, content, author) 
+-- VALUES 
+-- (19, '191919다이어리타이틀에 대한 댓글입니다.', '김무양');
+
+-- INSERT INTO comments (diary_id, content, author) 
+-- VALUES 
+-- (19, '191919다이어리타이틀에 대한 댓글입니다.', '김무양22');
+
+select  * from comments;
+
+
+
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,              -- 댓글 ID (자동 증가)
+    diary_id INTEGER NOT NULL,          -- 댓글이 달린 블로그 포스트 ID
+    content TEXT NOT NULL,              -- 댓글 내용
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- 작성 시간
+    author VARCHAR(255) DEFAULT '익명', -- 댓글 작성자 (기본값 '익명')
+    CONSTRAINT fk_diary
+        FOREIGN KEY (diary_id) REFERENCES diaries(id) ON DELETE CASCADE -- 외래 키
+);
+
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,  -- 유저 고유 ID (자동 증가)
+    email VARCHAR(255) NOT NULL UNIQUE,  -- 이메일 (유일한 값)
+    password VARCHAR(255) NOT NULL      -- 비밀번호 (암호화된 비밀번호 저장)
+);
+
+
+INSERT INTO users (email, password) 
+VALUES ('qwer@naver.com', '1234');
