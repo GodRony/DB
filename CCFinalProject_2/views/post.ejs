@@ -50,11 +50,39 @@
                     </button>
                 </div>
             </div>
-            <form action="/add" method="post">
-                <input type="text" name="diaryTitle" placeholder="Diary Title" autocomplete="off" required />
-                <textarea name="diaryContent" placeholder="Write your diary here..." required></textarea>
-                <button class="add" type="submit">Add Diary</button>
-              </form>
+            <form action="/add" method="post" class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Create a New Diary</h2>
+                
+                <div>
+                    <input 
+                        type="text" 
+                        name="diaryTitle" 
+                        placeholder="Diary Title" 
+                        autocomplete="off" 
+                        required 
+                        class="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                    />
+                </div>
+            
+                <div>
+                    <textarea 
+                        name="diaryContent" 
+                        placeholder="Write your diary here..." 
+                        required 
+                        class="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                    ></textarea>
+                </div>
+            
+                <div class="flex justify-end">
+                    <button 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-300 focus:outline-none"
+                        type="submit"
+                    >
+                        Add Diary
+                    </button>
+                </div>
+            </form>
+            
         </div>
 
         <!-- 링크 모달 -->

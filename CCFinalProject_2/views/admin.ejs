@@ -59,8 +59,12 @@
                             <% if (diaries.length > 0) { %> <!-- diaries 배열에 데이터가 있는 경우 -->
                                 <% diaries.forEach(diary => { %>
                                     <tr class="border-b">
-                                        <td class="p-3"><%= diary.title %></td> <!-- 포스트 제목 -->
-                                        <td class="p-3"><%= new Date(diary.created_at).toLocaleDateString() %></td> <!-- 작성일 -->
+                                        <td class="p-3">
+                                            <a href="/admin_detail/<%= diary.id %>" class="text-blue-600 hover:underline">
+                                                <%= diary.title %>
+                                            </a>
+                                        </td>
+                                                                                <td class="p-3"><%= new Date(diary.created_at).toLocaleDateString() %></td> <!-- 작성일 -->
                                         <td class="p-3">
                                             <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
                                                 게시됨
