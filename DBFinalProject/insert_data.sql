@@ -81,6 +81,7 @@ select * from chats;
 DELETE FROM chats;
 DROP TABLE IF EXISTS chats;
 TRUNCATE TABLE chats;
+ALTER TABLE chats AUTO_INCREMENT = 1;
 
 CREATE TABLE chats (
     chatroom_id INT NOT NULL,
@@ -96,8 +97,8 @@ CREATE TABLE chats (
 INSERT INTO chats (chatroom_id, interested_user_id, content, manner_rating, last_update_date)
 VALUES
     (1, (SELECT user_id FROM users WHERE name = '이영희'), '대면 거래 가능한가요?', NULL, '2024-11-30'),
-    (1, (SELECT user_id FROM users WHERE name = '최수정'), '좋은 가격에 잘 샀습니다.', 5, '2024-12-05'),
-    (3, (SELECT user_id FROM users WHERE name = '홍길동'), '빠른 거래 감사합니다', 5, '2024-12-05'),
+    (2, (SELECT user_id FROM users WHERE name = '최수정'), '좋은 가격에 잘 샀습니다.', 5, '2024-12-05'),
+    (4, (SELECT user_id FROM users WHERE name = '홍길동'), '빠른 거래 감사합니다', 5, '2024-12-05'),
     (5, (SELECT user_id FROM users WHERE name = '박민수'), '네고 원합니다', NULL, '2024-12-04'),
     (6, (SELECT user_id FROM users WHERE name = '홍길동'), '매우 만족합니다', 5, '2024-12-05');
 
@@ -110,6 +111,14 @@ DELETE FROM finalprices;
 DROP TABLE IF EXISTS finalprices;
 TRUNCATE TABLE finalprices;
 ALTER TABLE finalprices AUTO_INCREMENT = 1; 
+
+CREATE TABLE finalprices (
+    final_price_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    posts_post_id INT NOT NULL,
+    final_price FLOAT,
+    FOREIGN KEY (posts_post_id) REFERENCES posts(post_id)
+);
+
 
 -- 1. finalprices 테이블에 final_price_id 추가
 ALTER TABLE finalprices
@@ -129,6 +138,7 @@ FOREIGN KEY (posts_post_id) REFERENCES posts(post_id);
 INSERT INTO finalprices (posts_post_id, final_price) 
 VALUES
     (1, 90000),
+	(2, 90000),
     (4, 80000),
 	(5, 10000),
     (6, 50000),
@@ -143,12 +153,14 @@ DELETE FROM transactions;
 DROP TABLE IF EXISTS transactions;
 TRUNCATE TABLE transactions;
 
+
 INSERT INTO transactions(transaction_id,posts_post_id,finalPrice_id,buyer_id,status,last_update_date)
 VALUES
 	(1,1,1,(SELECT user_id FROM users WHERE name = '최수정'),'거래완료','2024-12-4'),
-	(2,4,2,(SELECT user_id FROM users WHERE name = '홍길동'),'거래완료','2024-12-4'),
-	(3,5,3,(SELECT user_id FROM users WHERE name = '김철수'),'예약중','2024-12-4'),
-	(4,6,4,(SELECT user_id FROM users WHERE name = '박민수'),'예약중','2024-12-5'),
-	(4,7,5,(SELECT user_id FROM users WHERE name = '홍길동'),'거래완료','2024-12-5');
+	(2,2,2,(SELECT user_id FROM users WHERE name = '최수정'),'거래완료','2024-12-4'),    
+	(2,3,4,(SELECT user_id FROM users WHERE name = '홍길동'),'거래완료','2024-12-4'),
+	(3,4,5,(SELECT user_id FROM users WHERE name = '김철수'),'예약중','2024-12-4'),
+	(4,5,6,(SELECT user_id FROM users WHERE name = '박민수'),'예약중','2024-12-5'),
+	(5,6,7,(SELECT user_id FROM users WHERE name = '홍길동'),'거래완료','2024-12-5');
     
     
