@@ -23,7 +23,6 @@
                 <a href="#" class="text-gray-700 hover:text-blue-600">About</a>
                 <a href="/login" class="text-blue-600 font-semibold hover:bg-blue-100 px-3 py-1 rounded" role="button">로그인</a>
             </nav>
-            
         </div>
     </header>
 
@@ -45,7 +44,7 @@
             <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
                 <h2 class="text-2xl font-bold mb-6">최신 포스트</h2>
                 <div class="space-y-4">
-               
+                    <!-- 포스트가 여기에 표시됩니다 -->
                 </div>
             </div>
         </section>
@@ -68,6 +67,37 @@
                 </div>
             </div>
         </section>
+
+        <!-- 날씨 섹션 추가 -->
+        <section class="mt-12 bg-white p-6 rounded-lg shadow-md max-w-xs mx-0 ml-6">
+            <h3 class="text-2xl font-semibold text-left text-gray-800 mb-6">현재 날씨</h3>
+            <form action="/weather" method="get" class="flex items-center mb-4">
+                <input type="text" name="city" placeholder="도시 이름을 입력하세요" class="p-2 w-48 border rounded-l-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition duration-300 text-xs">날씨확인</button>
+
+            </form>
+            
+        
+            <% if (error) { %>
+            <p class="text-red-500 text-left font-semibold"><%= error %></p>
+            <% } else if (weather) { %>
+            <div class="bg-blue-50 p-4 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="text-left">
+                    <p class="text-xl font-semibold text-blue-600">
+                        <i class="fas fa-thermometer-half text-2xl"></i> <%= weather.main.temp %>&deg;F
+                    </p>
+                    <p class="text-lg text-gray-700">
+                        <i class="fas fa-cloud text-2xl"></i> <%= weather.weather[0].main %>
+                    </p>
+                    <p class="text-lg text-gray-500 mt-2">
+                        <i class="fas fa-map-marker-alt text-2xl"></i> <%= weather.name %>, <%= weather.sys.country %>
+                    </p>
+                </div>
+            </div>
+            <% } %>
+        </section>
+        
+        
     </main>
 
     <footer class="bg-white mt-12 py-8">
@@ -81,10 +111,6 @@
         </div>
     </footer>
 
-    <script>
-        document.getElementById('loginButton').addEventListener('click', function() {
-            window.location.href = 'login.html';
-        });
-    </script>
+    <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
 </body>
 </html>

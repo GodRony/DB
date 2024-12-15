@@ -1,9 +1,21 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import axios from 'axios';  // axios를 import로 불러옵니다.
+
+axios.get('https://api.example.com/data')
+  .then(response => {
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.log('Error:', error);
+  });
+
+
 
 const app = express();
 const port = 3000;
+
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -28,8 +40,51 @@ let items = [
 
 
 app.get("/", async (req, res) => {
-    res.render("index.ejs");
+  const city = "Seoul"; // Default city
+  const apiKey = "e668e22fda365ace6bab4579126bf50a"; // Your OpenWeatherMap API key
+  const APIUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+  let weather;
+  let error = null;
+  
+  try {
+    const response = await axios.get(APIUrl);
+    weather = response.data;
+  } catch (err) {
+    weather = null;
+    error = "Error, Please try again";
+  }
+
+  // Render the index template with the weather data and error message
+  res.render("index", { weather, error });
 });
+
+
+// Handle the /weather route
+app.get("/weather", async (req, res) => {
+  const city = req.query.city  || "Seoul"; // Default city
+  const apiKey = "e668e22fda365ace6bab4579126bf50a"; // Your OpenWeatherMap API key
+  const APIUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+  let weather;
+  let error = null;
+  
+  try {
+    const response = await axios.get(APIUrl);
+    weather = response.data;
+  } catch (err) {
+    console.error(err.message); 
+    weather = null;
+    error = "Error, Please try again";
+  }
+
+  // Render the index template with the weather data and error message
+  res.render("index", { weather, error });
+});
+
+
+// Render the index template with the weather data and error message
+
 
 
 app.get("/admin", async (req, res) => {
