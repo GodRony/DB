@@ -45,14 +45,54 @@ def get_posts():
             # 항목 사이에 구분선
             st.divider()
 
-# Streamlit 실행
-if __name__ == "__main__":
-    st.title("게시물 목록")
-    get_posts()  # 게시물 출력 함수 호출
+def get_posts_selected_city(city) :
+    # SQL 쿼리 (파라미터 바인딩을 사용하여 지역을 안전하게 전달)
+      with conn.session as session:
+            try:
+                query = text("""
+                    SELECT
+                        p.title,
+                        p.price,     
+                        u.alias,    
+                        r.region_name
+                    FROM posts p
+                    JOIN users u ON u.user_id = p.author_id
+                    JOIN regions r ON r.region_id =u.regions_region_id
+                    JOIN transactions t ON t.posts_post_id = p.post_id
+                    WHERE r.region_name = :city
+                """)
+                result = session.execute(query, {"city": city})
+                rows = result.fetchall()
+
+                # 게시물 UI 표시
+                if rows : 
+                    for row in rows:  
+                        with st.container():
+                            col1, col2 = st.columns([1, 4])  # 두 개의 컬럼을 사용해서 레이아웃을 나눔
+                            with col1:
+                                st.write(f"**{row.alias}**")  # 별칭을 굵게 표시
+                            with col2:
+                                st.write(f"**제목**: {row.title}")
+                                st.write(f"**가격**: {row.price} 원")
+                                st.write(f"**지역**: {row.region_name}")
+                            st.divider()
+                else:
+                    st.warning("해당 날짜에 작성된 일기가 없습니다.")
+            except Exception as e:
+                st.error(f"일기를 가져오는 중 오류가 발생했습니다: {str(e)}")
 
 
 def view_page():
+    
     st.subheader("게시글 조회")
+    city = st.selectbox("동네 선택:", ["춘천시 퇴계동", "춘천시 소양동", "춘천시 우두동", "전체"])
+
+    # city가 '전체'로 선택되지 않은 경우 선택된 동네에 맞는 게시물 조회
+    if city != "전체":
+        get_posts_selected_city(city)
+    else:
+        get_posts()  # city가 선택되지 않았으면 전체 게시물 조회
+
 
 
 def get_city_id(city_name):
