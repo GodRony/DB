@@ -9,8 +9,10 @@ df = conn.query('SELECT * FROM posts LIMIT 5;', ttl=600)
 import streamlit as st
 import pandas as pd
 
-# DB 연결 (여기서는 예시로 연결을 가정)
-# conn = ...
+current_logged_id = 0
+
+###########################################
+## 게시글 조회 ##
 
 def get_posts():
     # SQL 쿼리
@@ -130,9 +132,99 @@ def display_login_status():
     else:
         st.sidebar.success(f"{st.session_state.user}님으로 로그인이 되었습니다!")
 
+
+
 # 페이지 타이틀 설정
 st.sidebar.title("한림마켓")
+###################################
+## 새 게시글 작성 ##
 
+def view_page_writing_post():
+    # 로그인된 사용자의 ID 확인
+    if 'current_logged_id' not in st.session_state:
+        st.error("로그인 후 게시글을 작성할 수 있습니다.")
+        return
+
+    current_logged_id = st.session_state.current_logged_id  # 세션 상태에서 가져오기
+    
+    st.subheader("새 게시글 작성")
+   
+    find_query = text("""
+            SELECT 
+                r.region_name, u.alias
+                FROM users u
+                JOIN regions r ON u.regions_region_id = r.region_id
+                WHERE u.user_id = :current_logged_id;
+               """)
+                    # 쿼리 실행
+    with conn.session as session:
+         result = session.execute(find_query, {"current_logged_id": current_logged_id}).fetchone()
+   
+    if result:
+        st.write(f"작성자: {result[1]}( {result[0]})")
+    else:
+        st.write("결과가 없습니다.")
+    category = st.text_input("카테고리")
+    title = st.text_input("제목")
+    price = st.number_input("가격", min_value=0.0, step=1.0, format="%.1f")
+    created_date = st.text_input("작성일")
+    
+     
+
+    
+    if st.button("게시글 등록"):
+        if category and title and price and created_date:  # 모든 항목을 체크
+            with conn.session as session:
+                try:
+                    # POST 추가 : SQL 쿼리 준비
+                    insert_query_post = text("""
+                        INSERT INTO posts (category, title, price, created_date, author_id)
+                        VALUES (:category, :title, :price, :created_date, :author_id)
+                    """)
+
+                    # POST 추가 : 실행할 데이터 준비
+                    session.execute(insert_query_post, {
+                        "category": category,
+                        "title": title,
+                        "price": price,
+                        "created_date": created_date,
+                        "author_id": current_logged_id,
+                    })
+
+                    # 가장 최근에 삽입된 post_id 가져오기
+                    post_id_query = text("SELECT LAST_INSERT_ID()")
+                    result = session.execute(post_id_query)
+                    post_id = result.scalar()  # 결과에서 ID만 추출
+
+                    # post_id 출력 (또는 필요한 곳에 사용)
+                    st.write(f"새로운 게시글의 post_id는 {post_id}입니다.")
+
+                    # chatrooms 추가하기
+                    insert_query_chatrooms = text("""
+                    INSERT INTO chatrooms (posts_post_id)
+                    VALUES (:post_id)
+                    """)
+
+                    session.execute(insert_query_chatrooms, {"post_id": post_id})
+                    session.commit()  # 변경사항을 데이터베이스에 반영
+
+
+                    # 커밋하여 변경 사항을 저장
+                    session.commit()
+
+                except Exception as e:
+                    # 예외 처리
+                    st.error(f"DB 저장 중 오류가 발생했습니다: {str(e)}")
+
+        else:
+            # 필수 항목이 빈 값일 경우
+            st.error("모든 항목을 입력해주세요.")
+
+
+    
+   
+
+####################################
 # 로그인 상태에 따라 메시지 표시
 display_login_status()
 
@@ -144,7 +236,19 @@ if page == "로그인":
     st.sidebar.subheader("로그인")
     
     # 사용자 선택 (예시로 간단히 사용자 이름을 선택하는 방식)
-    user = st.sidebar.selectbox("사용자를 선택하세요:", ["사용자1", "사용자2", "사용자3"])
+    query = f"""
+        SELECT alias 
+        FROM users 
+        """
+    df = conn.query(query, ttl=0)
+
+    user_list = df['alias'].tolist()
+
+    # 사이드바에 selectbox 생성
+    if user_list:
+        user = st.sidebar.selectbox("사용자를 선택하세요:", user_list)
+    else:
+        st.sidebar.write("사용자가 없습니다.")
     
     # 로그인 버튼
     if st.sidebar.button("로그인"):
@@ -152,7 +256,23 @@ if page == "로그인":
         st.session_state.logged_in = True
         st.session_state.user = user  # 선택한 사용자 이름을 세션 상태에 저장
         st.sidebar.success(f"{user}님으로 로그인이 되었습니다!")
-        st.write(f"{user}님, 로그인 성공!")
+
+        # user_id 가져오기
+        query = f"""
+            SELECT user_id 
+            FROM users 
+            WHERE alias = '{user}'
+        """
+        
+        # 쿼리 실행 (하나의 값만 반환)
+        result = conn.query(query).iloc[0]  # 결과에서 첫 번째 행을 가져옴
+        st.session_state.current_logged_id = result['user_id']  # 세션 상태에 저장
+
+      #  st.write(f"{st.session_state.current_logged_id}님, 로그인 성공!")
+
+
+        
+
 
 # 회원가입 페이지
 elif page == "회원가입":
@@ -167,41 +287,49 @@ elif page == "회원가입":
     city = st.sidebar.selectbox("동네 선택:", ["춘천시 퇴계동", "춘천시 소양동", "춘천시 우두동"])
     
 # 가입하기 버튼
-if st.sidebar.button("가입하기"):
-    if name and alias and email and address:  # 모든 항목을 체크
-        with conn.session as session:
-            try:
-                region_id = get_city_id(city)  # 지역 ID 가져오기
+    if st.sidebar.button("가입하기"):
+        if name and alias and email and address:  # 모든 항목을 체크
+            with conn.session as session:
+                try:
+                    region_id = get_city_id(city)  # 지역 ID 가져오기
 
                 # SQL 쿼리 준비
-                insert_query = text("""
-                    INSERT INTO users (regions_region_id, name, alias, email, address, join_date)
-                    VALUES (:regions_region_id, :name, :alias, :email, :address, :join_date)
-                """)
+                    insert_query = text("""
+                       INSERT INTO users (regions_region_id, name, alias, email, address, join_date)
+                        VALUES (:regions_region_id, :name, :alias, :email, :address, :join_date)
+                    """)
 
                 # 실행할 데이터 준비
-                session.execute(insert_query, {
+                    session.execute(insert_query, {
                     "regions_region_id": region_id,
                     "name": name,
                     "alias": alias,
                     "email": email,
                     "address": address,
                     "join_date": join_date
-                })
+                     })
 
                 # 커밋하여 변경 사항을 저장
-                session.commit()
+                    session.commit()
 
-                # 성공 메시지
-                st.sidebar.success(f"{name}님, 회원가입이 완료되었습니다!")
+                 # 성공 메시지
+                    st.sidebar.success(f"{name}님, 회원가입이 완료되었습니다!")
 
-            except Exception as e:
+                except Exception as e:
                 # 예외 처리
-                st.error(f"DB 저장 중 오류가 발생했습니다: {str(e)}")
+                    st.error(f"DB 저장 중 오류가 발생했습니다: {str(e)}")
 
-    else:
+        else:
         # 필수 항목이 빈 값일 경우
-        st.error("모든 항목을 입력해주세요.")
+            st.error("모든 항목을 입력해주세요.")
 
 
-view_page()
+# 페이지 선택
+page = st.radio("원하는 작업을 선택하세요:", ("게시글 조회", "새 게시글 작성"))
+
+# 로그인 페이지
+if page == "게시글 조회":
+    view_page()
+elif page == "새 게시글 작성":
+    view_page_writing_post()
+    
