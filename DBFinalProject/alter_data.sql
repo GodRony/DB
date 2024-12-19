@@ -15,7 +15,17 @@ WHERE final_price_id = (
     WHERE transaction_id = 4
 );
 
+SELECT * FROM final_price_id;
+
+
 -- transactions 테이블에서 status를 '거래완료'로 변경하고, last_update_date를 현재 날짜로 설정
+-- 3번 문제 --
+DELETE FROM transactions
+WHERE posts_post_id = 2;
+
+
+
+-- test ---
 UPDATE transactions
 SET status = '거래완료', last_update_date = CURDATE()
 WHERE transaction_id = 4;
@@ -31,9 +41,4 @@ WHERE posts_post_id = 6;
 
 UPDATE transactions
 SET finalPrice_id = 7
-WHERE transaction_id = 5;
-
--- 3번 문제 --
-DELETE FROM transactions
-WHERE posts_post_id = 2;
-
+WHERE transaction_id = 2;

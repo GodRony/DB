@@ -41,7 +41,7 @@ VALUES
 
 
 
--- CHATROOMS ---
+
 describe chatrooms;
 DELETE FROM chatrooms;
 select * from chatrooms; 
@@ -55,7 +55,7 @@ CREATE TABLE chatrooms (
 ALTER TABLE chatrooms
     MODIFY chatroom_id INT NOT NULL AUTO_INCREMENT;
            -- chatroom_id만 기본 키로 설정
-
+-- CHATROOMS ---
 INSERT INTO chatrooms (chatroom_id, posts_post_id)
 VALUES
     (1, 1),  -- 첫 번째 채팅방, 첫 번째 게시글에 대한 채팅방
@@ -70,11 +70,6 @@ VALUES
 	(8, 8),
 	(9, 9);
 
-
-
-
-SELECT * FROM posts;
-
 -- CHATS --
 describe chats;
 select * from chats;
@@ -83,16 +78,7 @@ DROP TABLE IF EXISTS chats;
 TRUNCATE TABLE chats;
 ALTER TABLE chats AUTO_INCREMENT = 1;
 
-CREATE TABLE chats (
-    chatroom_id INT NOT NULL,
-    interested_user_id INT NOT NULL,
-    content TEXT,
-    manner_rating INT,
-    last_update_date DATETIME,
-    PRIMARY KEY (chatroom_id, interested_user_id), -- 복합 기본 키 설정 (post_id 제외)
-    FOREIGN KEY (chatroom_id) REFERENCES chatrooms(chatroom_id), -- chatrooms 테이블의 chatroom_id 참조
-    FOREIGN KEY (interested_user_id) REFERENCES users(user_id) -- users 테이블의 user_id 참조
-);
+
 
 INSERT INTO chats (chatroom_id, interested_user_id, content, manner_rating, last_update_date)
 VALUES
