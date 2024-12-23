@@ -2,14 +2,13 @@ import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 import axios from 'axios';  // axios를 import로 불러옵니다.
+import { OpenAI } from 'openai';
+import dotenv from 'dotenv';
 
-axios.get('https://api.example.com/data')
-  .then(response => {
-    console.log(response.data);
-  })
-  .catch(error => {
-    console.log('Error:', error);
-  });
+dotenv.config();  // .env 파일 로드
+
+console.log(process.env.OPENAI_API_KEY);  // API 키 출력
+
 
 
 
@@ -25,7 +24,7 @@ const db = new pg.Client({
   user: "postgres",
   host: "localhost",
   database: "permalist",
-  password: "",
+  password: "claud9",
   port: 5432,
 });
 db.connect();
@@ -55,15 +54,15 @@ app.get("/", async (req, res) => {
     error = "Error, Please try again";
   }
 
-  // Render the index template with the weather data and error message
+
   res.render("index", { weather, error });
 });
 
 
-// Handle the /weather route
+// 다른 날씨 보고싶을때 
 app.get("/weather", async (req, res) => {
-  const city = req.query.city  || "Seoul"; // Default city
-  const apiKey = "e668e22fda365ace6bab4579126bf50a"; // Your OpenWeatherMap API key
+  const city = req.query.city  || "Seoul"; // 디폴트는 서울
+  const apiKey = "e668e22fda365ace6bab4579126bf50a"; 
   const APIUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
 
   let weather;
@@ -78,13 +77,36 @@ app.get("/weather", async (req, res) => {
     error = "Error, Please try again";
   }
 
-  // Render the index template with the weather data and error message
+ 
   res.render("index", { weather, error });
 });
 
+// AI 채팅 요청 처리
 
-// Render the index template with the weather data and error message
+app.post("/chat", async (req, res) => {
+  const userMessage = req.body.message;
 
+  // 메시지가 없거나 비어있으면 처리하지 않도록 예외 처리
+  if (!userMessage || userMessage.trim() === "") {
+    return res.status(400).send("Message content cannot be empty.");
+  }
+
+  try {
+    // OpenAI API 호출
+    const response = await openai.chat.completions.create({
+      messages: [{ role: "user", content: userMessage }],
+      model: "gpt-3.5-turbo", // 또는 gpt-3.5-turbo
+    });
+
+    const aiResponse = response.choices[0].message.content;
+
+    // 사용자 메시지와 AI 응답을 클라이언트로 반환
+    res.json({ userMessage, aiResponse });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error with AI service");
+  }
+});
 
 
 app.get("/admin", async (req, res) => {
@@ -153,7 +175,7 @@ app.post("/add", async (req, res) => {
   }
 });
 
-
+// 전체 포스트에서 포스트 삭제
 app.post("/delete", async (req, res) => {
   const id = req.body.deleteItemId;  // 삭제할 포스트의 ID
   try {
@@ -164,9 +186,9 @@ app.post("/delete", async (req, res) => {
   }
 });
 
-//////////
 
-// 특정 포스트의 상세 페이지 라우터
+
+// 특정 포스트 보기 
 app.get("/admin_detail/:id", async (req, res) => {
   const { id } = req.params; // 포스트 ID
   try {
@@ -191,10 +213,9 @@ app.get("/admin_detail/:id", async (req, res) => {
 });
 
 
-// 댓글 추가
-// 댓글 추가
-app.post('/api/comments/:blogId', async (req, res) => {
-  const blogId = req.params.blogId;
+// 특정 포스트 댓글 추가
+app.post('/api/comments/:diaryId', async (req, res) => {
+  const diaryId = req.params.diaryId;
   const { author, content } = req.body;
   const createdAt = new Date(); // 현재 시간 설정
 
@@ -202,15 +223,13 @@ app.post('/api/comments/:blogId', async (req, res) => {
     // 댓글 데이터 저장
     await db.query(
       "INSERT INTO comments (diary_id, author, content, created_at) VALUES ($1, $2, $3, $4)", 
-      [blogId, author, content, createdAt]
+      [diaryId, author, content, createdAt]
     );
 
     // 댓글 추가 후 해당 블로그의 diaries 데이터 다시 불러오기
     const result = await db.query("SELECT * FROM diaries ORDER BY id DESC");
-    const diaries = result.rows;
-
-    // admin.ejs로 diaries를 전달
-    res.render('admin.ejs', { diaries: diaries }); // 댓글 추가 후 admin 페이지로 렌더링
+    res.redirect("/admin_detail/" + diaryId)
+//    res.render('admin.ejs', { diaries: diaries }); // 댓글 추가 후 admin 페이지로 렌더링
   } catch (err) {
     console.log(err);
     res.status(500).send("Server error");
@@ -218,7 +237,21 @@ app.post('/api/comments/:blogId', async (req, res) => {
 });
 
 
-
+// 특정 포스트 댓글 삭제
+app.post("/delete/:diaryId/:commentId", async (req, res) => {
+  const commentId = req.params.commentId;
+  const diaryId = req.params.diaryId;
+  try {
+    console.log(`Deleting comment with ID: ${commentId}`);
+    // DB에서 해당 댓글 삭제
+    await db.query("DELETE FROM comments WHERE id = $1", [commentId]);
+    
+    res.redirect("/admin_detail/" + diaryId);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server error");
+  }
+});
 
 
 app.listen(port, () => {

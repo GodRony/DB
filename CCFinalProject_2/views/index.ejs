@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <title>Hallym 블로그 메인페이지</title>
@@ -10,6 +11,7 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-100">
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -21,7 +23,8 @@
                 <a href="#" class="text-gray-700 hover:text-blue-600">홈</a>
                 <a href="/admin" class="text-gray-700 hover:text-blue-600" role="button">글쓰기</a>
                 <a href="#" class="text-gray-700 hover:text-blue-600">About</a>
-                <a href="/login" class="text-blue-600 font-semibold hover:bg-blue-100 px-3 py-1 rounded" role="button">로그인</a>
+                <a href="/login" class="text-blue-600 font-semibold hover:bg-blue-100 px-3 py-1 rounded"
+                    role="button">로그인</a>
             </nav>
         </div>
     </header>
@@ -32,14 +35,14 @@
             <div class="bg-white p-6 rounded-lg shadow-md md:col-span-1">
                 <h2 class="text-xl font-bold mb-4">한림의 소식과 이야기를 전하는 공간</h2>
                 <p class="text-gray-600">
-                    학업, 연구, 그리고 대학 생활의 모든 것을 담은 한림대학교 블로그를 만나보세요. 
+                    학업, 연구, 그리고 대학 생활의 모든 것을 담은 한림대학교 블로그를 만나보세요.
                 </p>
                 <div class="mt-4 flex space-x-3">
                     <a href="#" class="text-blue-600 hover:underline">팔로우</a>
                     <a href="#" class="text-blue-600 hover:underline">연락하기</a>
                 </div>
             </div>
-        
+
             <!-- 최신 포스트 -->
             <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
                 <h2 class="text-2xl font-bold mb-6">최신 포스트</h2>
@@ -72,32 +75,91 @@
         <section class="mt-12 bg-white p-6 rounded-lg shadow-md max-w-xs mx-0 ml-6">
             <h3 class="text-2xl font-semibold text-left text-gray-800 mb-6">현재 날씨</h3>
             <form action="/weather" method="get" class="flex items-center mb-4">
-                <input type="text" name="city" placeholder="도시 이름을 입력하세요" class="p-2 w-48 border rounded-l-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition duration-300 text-xs">날씨확인</button>
+                <input type="text" name="city" placeholder="도시 이름을 입력하세요"
+                    class="p-2 w-48 border rounded-l-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                <button type="submit"
+                    class="bg-blue-500 text-white px-4 py-2.5 rounded-r-lg hover:bg-blue-600 transition duration-100 text-xs">날씨확인</button>
 
             </form>
-            
-        
+
+
             <% if (error) { %>
-            <p class="text-red-500 text-left font-semibold"><%= error %></p>
-            <% } else if (weather) { %>
-            <div class="bg-blue-50 p-4 rounded-lg shadow-md border-t-4 border-blue-500">
-                <div class="text-left">
-                    <p class="text-xl font-semibold text-blue-600">
-                        <i class="fas fa-thermometer-half text-2xl"></i> <%= weather.main.temp %>&deg;F
-                    </p>
-                    <p class="text-lg text-gray-700">
-                        <i class="fas fa-cloud text-2xl"></i> <%= weather.weather[0].main %>
-                    </p>
-                    <p class="text-lg text-gray-500 mt-2">
-                        <i class="fas fa-map-marker-alt text-2xl"></i> <%= weather.name %>, <%= weather.sys.country %>
-                    </p>
-                </div>
-            </div>
-            <% } %>
+                <p class="text-red-500 text-left font-semibold">
+                    <%= error %>
+                </p>
+                <% } else if (weather) { %>
+                    <div class="bg-blue-50 p-4 rounded-lg shadow-md border-t-4 border-blue-500">
+                        <div class="text-left">
+                            <p class="text-xl font-semibold text-blue-600">
+                                <i class="fas fa-thermometer-half text-2xl"></i>
+                                <%= weather.main.temp %>&deg;F
+                            </p>
+                            <p class="text-lg text-gray-700">
+                                <i class="fas fa-cloud text-2xl"></i>
+                                <%= weather.weather[0].main %>
+                            </p>
+                            <p class="text-lg text-gray-500 mt-2">
+                                <i class="fas fa-map-marker-alt text-2xl"></i>
+                                <%= weather.name %>, <%= weather.sys.country %>
+                            </p>
+                        </div>
+                    </div>
+                    <% } %>
         </section>
-        
-        
+
+        <!-- 하단에 채팅 섹션 추가 -->
+        <section class="mt-12 bg-white p-6 rounded-lg shadow-md fixed bottom-0 left-0 right-0">
+            <h3 class="text-2xl font-semibold text-left text-gray-800 mb-6">AI 채팅</h3>
+
+            <div id="chat-box" class="overflow-y-auto max-h-60 mb-4 p-2 bg-gray-50 rounded-lg">
+                <!-- 사용자와 AI의 대화 내용이 여기에 표시됩니다 -->
+            </div>
+
+            <form id="chat-form" action="#" method="post" class="flex">
+                <input type="text" id="message-input" name="message" placeholder="메시지를 입력하세요"
+                    class="p-2 w-full border rounded-l-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                <button type="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition duration-300 text-xs">보내기</button>
+            </form>
+        </section>
+
+        <script>
+            const chatForm = document.getElementById("chat-form");
+            const messageInput = document.getElementById("message-input");
+            const chatBox = document.getElementById("chat-box");
+
+            chatForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const message = messageInput.value.trim();
+                if (message) {
+                    // 사용자 메시지 추가
+                    chatBox.innerHTML += `<p class="text-left text-blue-600">${message}</p>`;
+                    messageInput.value = "";
+
+                    // AI 응답 요청
+                    const response = await fetch("/chat", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ message }),
+                    });
+
+                    const data = await response.json();
+                    const aiMessage = data.aiResponse;
+
+                    // AI 메시지 추가
+                    chatBox.innerHTML += `<p class="text-left text-gray-700">${aiMessage}</p>`;
+
+                    // 채팅박스 스크롤을 맨 아래로
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            });
+        </script>
+
+
+
     </main>
 
     <footer class="bg-white mt-12 py-8">
@@ -113,4 +175,5 @@
 
     <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
 </body>
+
 </html>

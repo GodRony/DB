@@ -47,19 +47,18 @@
                 <!-- 댓글 목록 -->
                 <div id="commentsList" class="space-y-4">
                     <% comments.forEach(function(comment) { %>
-                        <div class="bg-gray-100 p-3 rounded-md flex justify-between items-center" id="comment-<%= comment.id %>">
+                        <div class="bg-gray-100 p-3 rounded-md flex justify-between items-center" id="comment-<%=comment.id
+                             %>">
                             <div>
                                 <p><strong><%= comment.author %>:</strong> <%= comment.content %></p>
                                 <small class="text-gray-500"><%= new Date(comment.created_at).toLocaleString() %></small>
                             </div>
-                            <form action="/api/comments/<%= diary.id %>/delete/<%= comment.id %>" method="post">
-                                <button 
-                                    type="submit" 
-                                    class="text-red-500 hover:text-red-700"
-                                >
+                            <form action="/delete/<%= diary.id %>/<%= comment.id %>" method="post">
+                                <button type="submit" class="text-red-500 hover:text-red-700">
                                     삭제
                                 </button>
                             </form>
+                              
                         </div>
                     <% }) %>
                 </div>
