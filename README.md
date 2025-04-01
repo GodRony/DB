@@ -66,6 +66,8 @@ status と final_price を別のテーブルに分離する。
 ![image](https://github.com/user-attachments/assets/928e1110-848a-4b6d-ade5-57e2361c92eb)
 ![image](https://github.com/user-attachments/assets/a21f19f1-6593-42fd-9729-142eccd78a43)
 
+**コード部分は、myapp.py ファイルを参考にして、delete、insert、selectクエリをどのように実行したのか参考にしてください**
+
 -----------------------------------------------------------------
 
 MySQL과 파이썬을 연동해서 중고제품을 사고파는 마켓을 만들었습니다.
@@ -106,6 +108,7 @@ title, region_name, status , price 판매자를 볼 수 있게했다.
 대화내역보기를 누르면 대화내역을 볼 수 있다.
 메세지를 입력하고 전송하기 버튼을 누르면 대화내역보기에 반영이 된다.
 
+**코드부분은 myapp.py 파일을 참고해서 delete, insert, select 쿼리를 어떻게 수행했는지 참고해주시길 바랍니다.**
 
 
 -----------------------------------------------
